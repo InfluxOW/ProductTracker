@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Product;
 use App\Retailer;
 use App\Stock;
+use App\User;
 
 class RetailerWithProductSeeder extends Seeder
 {
@@ -23,5 +24,7 @@ class RetailerWithProductSeeder extends Seeder
             'sku' => 12345,
             'in_stock' => false
         ]));
+
+        factory(User::class)->create();
     }
 }

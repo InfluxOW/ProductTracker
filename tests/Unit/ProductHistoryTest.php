@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\History;
 use App\Product;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class ProductHistoryTest extends TestCase
         $this->assertCount(1, $product->fresh()->history);
 
         $stock = $product->stock->first();
-        $history = $product->history->first();
+        $history = $product->fresh()->history->first();
         $this->assertEquals($stock->price, $history->price);
         $this->assertEquals($stock->in_stock, $history->in_stock);
         $this->assertEquals($stock->product_id, $history->product_id);

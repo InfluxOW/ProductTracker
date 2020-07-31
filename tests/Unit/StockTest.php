@@ -28,27 +28,13 @@ class StockTest extends TestCase
     public function it_updates_local_stock_status_after_being_tracked()
     {
         $this->seed(RetailerWithProductSeeder::class);
+        $this->mockClientRequest($available = true, $price = 9900);
 
         $stock = Stock::first();
-
-        ClientFactory::shouldReceive('make->checkAvailability')
-            ->once()
-            ->andReturn(
-                new StockStatus($available = true, $price = 9900)
-            );
-
         $stock->track();
 
         $this->assertTrue($stock->in_stock);
-        $this->assertEquals(9900, $stock->price);
+        $this->assertEquals($price, $stock->price);
 
-    }
-}
-
-class FakeClient implements Client
-{
-    public function checkAvailability(Stock $stock): StockStatus
-    {
-        return new StockStatus($available = true, $price = 9900);
     }
 }
