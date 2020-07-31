@@ -18,13 +18,28 @@ class Product extends Model
         return $this->hasMany(Stock::class);
     }
 
+    public function track()
+    {
+        $this->stock->each(function(Stock $stock) {
+            $stock->track();
+            $this->recordHistory($stock);
+        });
+    }
+
     public function history()
     {
         return $this->hasMany(History::class);
     }
 
-    public function track()
+    public function recordHistory(Stock $stock)
     {
-        $this->stock->each->track();
+        $history = History::make([
+            'price' => $stock->price,
+            'in_stock' => $stock->in_stock,
+        ]);
+
+        $history->product()->associate($this);
+        $history->stock()->associate($stock);
+        $history->save();
     }
 }

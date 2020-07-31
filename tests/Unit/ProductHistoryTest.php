@@ -2,11 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\Stock;
-use App\History;
-use Illuminate\Support\Facades\Http;
-use Tests\TestCase;
+use App\Product;
 use RetailerWithProductSeeder;
+use Tests\TestCase;
 
 class ProductHistoryTest extends TestCase
 {
@@ -14,15 +12,15 @@ class ProductHistoryTest extends TestCase
     public function it_records_history_each_time_stock_tracked()
     {
         $this->seed(RetailerWithProductSeeder::class);
-        Http::fake(fn() => ['onlineAvailability' => true, 'salePrice' => 299.99]);
+        $this->mockClientRequest();
 
-        $this->assertEquals(0, History::count());
+        $product = Product::first();
+        $this->assertEmpty($product->history);
+        $product->track();
+        $this->assertCount(1, $product->fresh()->history);
 
-        $stock = tap(Stock::first())->track();
-
-        $this->assertEquals(1, History::count());
-
-        $history = History::first();
+        $stock = $product->stock->first();
+        $history = $product->history->first();
         $this->assertEquals($stock->price, $history->price);
         $this->assertEquals($stock->in_stock, $history->in_stock);
         $this->assertEquals($stock->product_id, $history->product_id);
