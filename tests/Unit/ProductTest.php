@@ -8,7 +8,7 @@ use App\Stock;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class ProductTest extends TestCase
 {
     /** @test */
     public function it_checks_stock_for_products_at_retailers()
