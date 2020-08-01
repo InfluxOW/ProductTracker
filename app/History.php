@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class History extends Model
 {
-    protected $fillable = ['price', 'in_stock', 'product_id'];
+    protected $fillable = ['price', 'in_stock', 'product_id', 'stock_id'];
     protected $table = 'product_history';
 
     public function product()

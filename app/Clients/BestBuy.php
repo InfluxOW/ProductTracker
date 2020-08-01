@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Http;
 
 class BestBuy implements Client
 {
+    protected $key;
+
+    public function __construct()
+    {
+        $this->key = config('services.clients.bestBuy.key');
+    }
+
     public function checkAvailability(Stock $stock): StockStatus
     {
         $results = Http::get($this->endpoint($stock->sku))->json();
@@ -19,8 +26,6 @@ class BestBuy implements Client
 
     protected function endpoint($sku): string
     {
-        $key = config('services.clients.bestBuy.key');
-
-        return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$key}";
+        return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
     }
 }

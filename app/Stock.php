@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\NowInStock;
+use App\UseCases\TrackStock;
 use Facades\App\Clients\ClientFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,16 +27,6 @@ class Stock extends Model
 
     public function track()
     {
-        $status = $this->retailer->client()
-            ->checkAvailability($this);
-
-        if (!$this->in_stock && $status->available) {
-            event(new NowInStock($this));
-        }
-
-        $this->update([
-            'in_stock' => $status->available,
-            'price' => $status->price
-        ]);
+        TrackStock::dispatch($this);
     }
 }
