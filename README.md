@@ -1,3 +1,7 @@
+![Main workflow](https://github.com/InfluxOW/StockTrackerConsoleApp/workflows/Main%20workflow/badge.svg)
+[![codecov](https://codecov.io/gh/InfluxOW/StockTrackerConsoleApp/branch/master/graph/badge.svg)](https://codecov.io/gh/InfluxOW/StockTrackerConsoleApp)
+
+
 # Stock Tracker Console App
 It allows you to track items from online shops (only BestBuy is included, but it's extendable).
 
