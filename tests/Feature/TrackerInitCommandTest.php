@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
 
-class TrackCommandTest extends TestCase
+class TrackerInitCommandTest extends TestCase
 {
     /** @test */
     public function it_tracks_product_stock()
@@ -19,7 +19,7 @@ class TrackCommandTest extends TestCase
 
         $this->mockClientRequest();
 
-        $this->artisan('track');
+        $this->artisan('tracker:init');
 
         $this->assertTrue(Product::first()->inStock());
     }

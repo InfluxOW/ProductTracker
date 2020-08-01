@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use App\Product;
 use Illuminate\Console\Command;
 
-class TrackCommand extends Command
+class TrackerInitCommand extends Command
 {
-    protected $signature = 'track';
+    protected $signature = 'tracker:init';
     protected $description = 'Track all product stock';
 
     public function handle()
