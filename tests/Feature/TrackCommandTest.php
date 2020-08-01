@@ -9,24 +9,17 @@ use Tests\TestCase;
 
 class TrackCommandTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Notification::fake();
-
-        $this->seed(RetailerWithProductSeeder::class);
-    }
-
     /** @test */
     public function it_tracks_product_stock()
     {
+        $this->seed(RetailerWithProductSeeder::class);
+        Notification::fake();
+
         $this->assertFalse(Product::first()->inStock());
 
         $this->mockClientRequest();
 
-        $this->artisan('track')
-            ->expectsOutput('All done!');
+        $this->artisan('track');
 
         $this->assertTrue(Product::first()->inStock());
     }

@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\History;
 use App\Product;
+use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
 
@@ -12,6 +13,7 @@ class ProductHistoryTest extends TestCase
     /** @test */
     public function it_records_history_each_time_stock_tracked()
     {
+        Notification::fake();
         $this->seed(RetailerWithProductSeeder::class);
         $this->mockClientRequest();
 
@@ -20,7 +22,7 @@ class ProductHistoryTest extends TestCase
         $product->track();
         $this->assertCount(1, $product->fresh()->history);
 
-        $stock = $product->stock->first();
+        $stock = $product->fresh()->stock->first();
         $history = $product->fresh()->history->first();
         $this->assertEquals($stock->price, $history->price);
         $this->assertEquals($stock->in_stock, $history->in_stock);

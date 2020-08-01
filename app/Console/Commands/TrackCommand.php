@@ -7,29 +7,39 @@ use Illuminate\Console\Command;
 
 class TrackCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'track';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Track all product stock';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
-        Product::all()->each->track();
+        $products = Product::all();
 
-        $this->info('All done!');
+        $this->output->progressStart($products->count());
+
+        $products->each(function ($product) {
+            $product->track();
+            $this->output->progressAdvance();
+        });
+
+        $this->output->progressFinish();
+
+        $this->showResults();
+    }
+
+    protected function showResults()
+    {
+        $data = Product::query()
+            ->leftJoin('stock', 'stock.product_id', '=', 'products.id')
+            ->get($this->keys());
+
+        $this->table(
+            $this->keys(),
+            $data
+        );
+    }
+
+    protected function keys()
+    {
+        return ['name', 'price', 'sku', 'url', 'in_stock'];
     }
 }

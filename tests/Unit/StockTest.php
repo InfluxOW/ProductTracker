@@ -8,6 +8,7 @@ use App\Exceptions\ClientException;
 use App\Retailer;
 use App\Stock;
 use Facades\App\Clients\ClientFactory;
+use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
 
@@ -27,14 +28,15 @@ class StockTest extends TestCase
     /** @test */
     public function it_updates_local_stock_status_after_being_tracked()
     {
+        Notification::fake();
         $this->seed(RetailerWithProductSeeder::class);
         $this->mockClientRequest($available = true, $price = 9900);
 
         $stock = Stock::first();
         $stock->track();
 
-        $this->assertTrue($stock->in_stock);
-        $this->assertEquals($price, $stock->price);
+        $this->assertTrue($stock->fresh()->in_stock);
+        $this->assertEquals($price, $stock->fresh()->price);
 
     }
 }
