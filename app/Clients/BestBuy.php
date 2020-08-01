@@ -20,7 +20,8 @@ class BestBuy implements Client
 
         return new StockStatus(
             $results['onlineAvailability'],
-            $results['salePrice'] * 100
+            $results['salePrice'] * 100,
+            $results['url']
         );
     }
 

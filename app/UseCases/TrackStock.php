@@ -53,7 +53,8 @@ class TrackStock implements ShouldQueue
     {
         $this->stock->update([
             'in_stock' => $this->status->available,
-            'price' => $this->status->price
+            'price' => $this->status->price,
+            'url' => $this->status->url
         ]);
     }
 

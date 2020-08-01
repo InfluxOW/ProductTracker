@@ -19,10 +19,7 @@ class RetailerWithProductSeeder extends Seeder
         $bestBuy = Retailer::create(['name' => 'Best Buy']);
 
         $bestBuy->addStock($switch, new Stock([
-            'price' => 10000,
-            'url' => 'http://foobar.example',
-            'sku' => 12345,
-            'in_stock' => false
+            'sku' => 6364253,
         ]));
 
         factory(User::class)->create();

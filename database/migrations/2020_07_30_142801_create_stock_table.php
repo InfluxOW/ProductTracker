@@ -17,10 +17,10 @@ class CreateStockTable extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('retailer_id')->constrained()->cascadeOnDelete();
-            $table->unsignedInteger('price');
-            $table->string('sku')->nullable();
-            $table->string('url');
-            $table->boolean('in_stock');
+            $table->unsignedInteger('price')->nullable();
+            $table->string('sku');
+            $table->string('url')->nullable();
+            $table->boolean('in_stock')->nullable();
             $table->timestamps();
         });
     }
