@@ -55,13 +55,15 @@ class BestBuy implements Client
             'apiKey' => $this->key
         ]);
 
-        $search = Str::of($input)
-            ->explode(' ')
-            ->map(function ($searchTerm) {
-                return Str::start($searchTerm, "search=");
-            })
-            ->add($options['filters'])
-            ->implode('&');
+        $search = trim(
+                Str::of($input)
+                    ->explode(' ')
+                    ->map(function ($searchTerm) {
+                        return Str::start($searchTerm, "search=");
+                    })
+                    ->add($options['filters'])
+                    ->implode('&'),
+            '&');
 
         return "https://api.bestbuy.com/v1/products({$search})?{$query}";
     }
