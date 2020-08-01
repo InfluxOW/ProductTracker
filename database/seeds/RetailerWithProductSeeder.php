@@ -22,6 +22,6 @@ class RetailerWithProductSeeder extends Seeder
             'sku' => 6364253,
         ]));
 
-        factory(User::class)->create();
+        factory(User::class)->create(['name' => 'admin', 'email' => 'admin@admin.com']);
     }
 }

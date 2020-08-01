@@ -35,7 +35,7 @@ class StockTest extends TestCase
         $stock = Stock::first();
         $stock->track();
 
-        $this->assertTrue($stock->fresh()->in_stock);
+        $this->assertEquals($available, $stock->fresh()->in_stock);
         $this->assertEquals($price, $stock->fresh()->price);
 
     }

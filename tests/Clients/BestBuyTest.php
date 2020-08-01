@@ -25,7 +25,7 @@ class BestBuyTest extends TestCase
         $stock->update([
             'sku' => '6364253', // Nintendo Switch SKU
         ]);
-
+        
         try {
             (new BestBuy())->checkAvailability($stock);
         } catch (\Exception $e) {

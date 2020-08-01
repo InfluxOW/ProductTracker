@@ -12,8 +12,8 @@ class TrackCommandTest extends TestCase
     /** @test */
     public function it_tracks_product_stock()
     {
-        $this->seed(RetailerWithProductSeeder::class);
         Notification::fake();
+        $this->seed(RetailerWithProductSeeder::class);
 
         $this->assertFalse(Product::first()->inStock());
 

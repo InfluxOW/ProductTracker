@@ -1,0 +1,40 @@
+name: Main workflow
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          extensions: mbstring, curl, dom, xml, zip, sqlite
+          tools: prestissimo
+          php-version: '7.4'
+
+      - name: PHP Security Checker
+        uses: StephaneBour/actions-php-security-checker@1.0
+
+      - name: Setup project
+        run: make setup
+
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        run: make test-coverage
+        env:
+          BEST_BUY_KEY: ${{ secrets.BEST_BUY_KEY }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./build/logs/clover.xml
+          fail_ci_if_error: true
