@@ -2,8 +2,7 @@
 
 namespace App\UseCases;
 
-use App\Clients\StockStatus;
-use App\Events\NowInStock;
+use App\Clients\Helpers\StockStatus;
 use App\History;
 use App\Notifications\ImportantStockUpdate;
 use App\Stock;
@@ -49,6 +48,11 @@ class TrackStock implements ShouldQueue
 
     }
 
+    protected function isNowInStock()
+    {
+        return !$this->stock->in_stock && $this->status->available;
+    }
+
     protected function refreshStock()
     {
         $this->stock->update([
@@ -66,10 +70,5 @@ class TrackStock implements ShouldQueue
             'stock_id' => $this->stock->id,
             'product_id' => $this->stock->product_id,
         ]);
-    }
-
-    protected function isNowInStock()
-    {
-        return ! $this->stock->in_stock && $this->status->available;
     }
 }

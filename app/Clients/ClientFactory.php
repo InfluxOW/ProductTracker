@@ -11,7 +11,7 @@ class ClientFactory
 {
     public function make(Retailer $retailer): Client
     {
-        $class = "App\\Clients\\" . Str::studly($retailer->name);
+        $class = "App\\Clients\\Implementations\\" . Str::studly($retailer->name);
 
         throw_if(!class_exists($class), new ClientException("Client not found for {$retailer->name}."));
 

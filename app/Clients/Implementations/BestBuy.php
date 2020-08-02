@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Clients;
+namespace App\Clients\Implementations;
 
+use App\Clients\Client;
+use App\Clients\Helpers\StockStatus;
 use App\Stock;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;

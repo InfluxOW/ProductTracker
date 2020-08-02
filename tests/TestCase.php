@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Clients\StockStatus;
+use App\Clients\Helpers\StockStatus;
 use Facades\App\Clients\ClientFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;

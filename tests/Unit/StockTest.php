@@ -2,12 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\Clients\Client;
-use App\Clients\StockStatus;
 use App\Exceptions\ClientException;
 use App\Retailer;
 use App\Stock;
-use Facades\App\Clients\ClientFactory;
 use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;

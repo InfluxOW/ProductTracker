@@ -3,7 +3,7 @@
 namespace Tests\Clients;
 
 use App\Stock;
-use App\Clients\BestBuy;
+use App\Clients\Implementations\BestBuy;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use RetailerWithProductSeeder;
@@ -25,7 +25,7 @@ class BestBuyTest extends TestCase
         $stock->update([
             'sku' => '6364253', // Nintendo Switch SKU
         ]);
-        
+
         try {
             (new BestBuy())->checkAvailability($stock);
         } catch (\Exception $e) {
