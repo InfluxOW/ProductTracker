@@ -2,10 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-
-class TrackerRetailersCommand extends Command
+class TrackerRetailersCommand extends Tracker
 {
     protected $signature = 'tracker:retailers';
     protected $description = 'Show all available retailers';
@@ -13,7 +10,7 @@ class TrackerRetailersCommand extends Command
     public function handle()
     {
         $retailers = collect(
-            $this->getFilesInfo(app_path('Clients/Implementations'))
+            getFilesInfo(app_path('Clients/Implementations'))
         )
             ->map->getFilenameWithoutExtension();
 

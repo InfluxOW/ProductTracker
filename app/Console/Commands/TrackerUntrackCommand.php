@@ -4,11 +4,8 @@ namespace App\Console\Commands;
 
 use App\Exceptions\ProductException;
 use App\Product;
-use App\Stock;
-use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
-class TrackerUntrackCommand extends Command
+class TrackerUntrackCommand extends Tracker
 {
     protected $signature = 'tracker:untrack
     { product : Full name or first letters of the product you want to untrack [register matters] }';

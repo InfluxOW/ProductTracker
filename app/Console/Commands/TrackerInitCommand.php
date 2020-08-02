@@ -2,11 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Product;
 use App\Stock;
-use Illuminate\Console\Command;
 
-class TrackerInitCommand extends Command
+class TrackerInitCommand extends Tracker
 {
     protected $signature = 'tracker:init';
     protected $description = 'Track all products stock';
@@ -15,7 +13,7 @@ class TrackerInitCommand extends Command
     {
         $this->output->progressStart(Stock::count());
 
-        Stock::each(function ($stock) {
+        Stock::each(function($stock) {
             $stock->track();
             $this->output->progressAdvance();
         });

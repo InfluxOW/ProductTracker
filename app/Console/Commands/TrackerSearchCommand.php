@@ -7,9 +7,8 @@ use App\Exceptions\RetailerException;
 use App\Product;
 use App\Retailer;
 use App\Stock;
-use Illuminate\Console\Command;
 
-class TrackerSearchCommand extends Command
+class TrackerSearchCommand extends Tracker
 {
     protected $signature = 'tracker:search
     { retailer? : Retailer you want to use. Use `tracker:retailers` to check available retailers. }
@@ -47,24 +46,9 @@ class TrackerSearchCommand extends Command
         $this->options = $this->options();
 
         $this->userInput['retailer'] = $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?');
-        $this->retailer = $this->getRetailer();
+        $this->retailer = $this->getRetailer($this->userInput['retailer']);
 
         $this->userInput['product'] = $this->argument('product') ?? $this->ask('What product are you looking for?');
-    }
-
-    protected function getRetailer()
-    {
-        $retailer = Retailer::all()
-            ->filter(function($retailer) {
-                return toLowercaseWord($this->userInput['retailer']) === toLowercaseWord($retailer->name);
-            })->first();
-
-        throw_if(
-            is_null($retailer),
-            new RetailerException("Retailer {$this->userInput['retailer']} has not been found.")
-        );
-
-        return $retailer;
     }
 
     protected function getSearchResults()
@@ -132,6 +116,19 @@ class TrackerSearchCommand extends Command
         }
     }
 
+    protected function getItemToTrack($products)
+    {
+        $sku = $this->ask('Enter SKU of the product you want to track');
+        $item = collect($products)->firstWhere('sku', '==', $sku);
+
+        throw_if(
+            is_null($item),
+            new ProductException("Product with SKU {$sku} has not been found in the search results")
+        );
+
+        return $item;
+    }
+
     protected function track($item)
     {
         $product = Product::firstOrCreate(['name' => $item['name']]);
@@ -145,18 +142,5 @@ class TrackerSearchCommand extends Command
         $this->retailer->addStock($product, $stock);
 
         $this->info("Product {$product->name} has been tracked!");
-    }
-
-    protected function getItemToTrack($products)
-    {
-        $sku = $this->ask('Enter SKU of the product you want to track');
-        $item = collect($products)->firstWhere('sku', '==', $sku);
-
-        throw_if(
-            is_null($item),
-            new ProductException("Product with SKU {$sku} has not been found in the search results")
-        );
-
-        return $item;
     }
 }

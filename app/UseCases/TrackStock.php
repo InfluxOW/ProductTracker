@@ -50,7 +50,7 @@ class TrackStock implements ShouldQueue
 
     protected function isNowInStock()
     {
-        return ! $this->stock->in_stock && $this->status->available;
+        return $this->stock->in_stock !== false && $this->status->available;
     }
 
     protected function refreshStock()
