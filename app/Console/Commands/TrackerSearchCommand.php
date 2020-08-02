@@ -2,30 +2,28 @@
 
 namespace App\Console\Commands;
 
-use App\Clients\Helpers\StockStatus;
-use App\Exceptions\ClientException;
 use App\Exceptions\ProductException;
 use App\Exceptions\RetailerException;
 use App\Product;
 use App\Retailer;
 use App\Stock;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class TrackerSearchCommand extends Command
 {
     protected $signature = 'tracker:search
     { retailer? : Retailer you want to use. Use `tracker:retailers` to check available retailers. }
     { product? : Name of the product you are looking for. }
-    { --perPage=20 : Items per page <1-100> }
+    { --per=20 : Items per page <1-100> }
     { --page=1 : Current search page }
     { --filters= : Filter results by any params (e.g. `onlineAvailability=true`) }
-    { --sort=salePrice.asc : Sort results by any params }
-    { --showAttributes=sku,name,salePrice,onlineAvailability,url : Product attributes that you want to receive }';
+    { --sort=price.asc : Sort results by any params }
+    { --attributes=sku,name,price,in_stock,url : Product attributes that you want to receive }';
     protected $description = 'Search for a product in the stock of the selected retailer';
 
     protected $userInput;
     protected $retailer;
+    protected $options;
 
     public function handle()
     {
@@ -46,8 +44,11 @@ class TrackerSearchCommand extends Command
 
     protected function setInitialData()
     {
+        $this->options = $this->options();
+
         $this->userInput['retailer'] = $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?');
         $this->retailer = $this->getRetailer();
+
         $this->userInput['product'] = $this->argument('product') ?? $this->ask('What product are you looking for?');
     }
 
@@ -76,13 +77,39 @@ class TrackerSearchCommand extends Command
 
     protected function getSearchOptions()
     {
-        return [
-            'perPage' => $this->option('perPage'),
-            'page' => $this->option('page'),
-            'showAttributes' => $this->option('showAttributes'),
-            'filters' => $this->option('filters'),
-            'sort' => $this->option('sort')
-        ];
+        $this->replaceOptionsKeys()->replaceOptionsValues();
+
+        return $this->options;
+    }
+
+    protected function replaceOptionsValues()
+    {
+        $attributes = $this->retailer->client()->getProductAttributes();
+
+        foreach ($this->options as $key => $value) {
+            foreach ($attributes as $option => $attribute) {
+                if (str_contains($value, $option)) {
+                    $this->options[$key] = str_replace($option, $attribute, $this->options[$key]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function replaceOptionsKeys()
+    {
+        $attributes = $this->retailer->client()->getSearchAttributes();
+
+        foreach ($this->options as $key => $value) {
+            unset($this->options[$key]);
+
+            if (array_key_exists($key, $attributes)) {
+                $this->options[$attributes[$key]] = $value;
+            }
+        }
+
+        return $this;
     }
 
     protected function displayResults($products, $pages)

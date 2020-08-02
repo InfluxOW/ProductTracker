@@ -3,6 +3,7 @@
 namespace App\Clients\Implementations;
 
 use App\Clients\Client;
+use App\Clients\Helpers\SearchResults;
 use App\Clients\Helpers\StockStatus;
 use App\Stock;
 use Illuminate\Support\Facades\Http;
@@ -11,14 +12,6 @@ use Illuminate\Support\Str;
 class BestBuy implements Client
 {
     protected $key;
-    protected $attributes = [
-        'sku' => 'sku',
-        'name' => 'name',
-        'price' => 'salePrice',
-        'sku' => 'sku',
-        'sku' => 'sku',
-
-    ];
 
     public function __construct()
     {
@@ -38,17 +31,17 @@ class BestBuy implements Client
 
     public function search($input, $options): array
     {
-        $results = Http::get(
-            $this->searchEndpoint($input, $options)
-        )->json();
+        $results = Http::get($this->searchEndpoint($input, $options))->json();
 
         $products = $results['products'];
         $pages = ['currentPage' => $results['currentPage'],  'totalPages' => $results['totalPages']];
 
         return [$products, $pages];
+
+        return new SearchResults($results);
     }
 
-    public function getAttributes(): array
+    public function getProductAttributes(): array
     {
         return [
             'sku' => 'sku',
@@ -59,13 +52,28 @@ class BestBuy implements Client
         ];
     }
 
-    protected function productEndpoint($sku)
+    public function getSearchAttributes(): array
     {
+        return [
+            'per' => 'perPage',
+            'page' => 'page',
+            'filters' => 'filters',
+            'sort' => 'sort',
+            'attributes' => 'showAttributes',
+        ];
+    }
+
+    public function productEndpoint(...$params): string
+    {
+        [$sku] = $params;
+
         return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
     }
 
-    protected function searchEndpoint($input, $options)
+    public function searchEndpoint(...$params): string
     {
+        [$input, $options] = $params;
+
         $query = http_build_query([
             'format' => 'json',
             'show' => $options['showAttributes'],
