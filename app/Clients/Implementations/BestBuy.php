@@ -5,6 +5,7 @@ namespace App\Clients\Implementations;
 use App\Clients\Client;
 use App\Clients\Helpers\SearchResults;
 use App\Clients\Helpers\StockStatus;
+use App\Exceptions\ApiException;
 use App\Stock;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -22,10 +23,14 @@ class BestBuy implements Client
     {
         $results = Http::get($this->productEndpoint($stock->sku))->json();
 
+        if (array_key_exists('error', $results)) {
+            throw new ApiException($results['error']['message']);
+        }
+
         return new StockStatus(
             $results['onlineAvailability'],
             $results['salePrice'] * 100,
-            $results['url'] ?? null
+            $results['url']
         );
     }
 

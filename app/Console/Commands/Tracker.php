@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\RetailerException;
+use App\Retailer;
 use Illuminate\Console\Command;
 
 abstract class Tracker extends Command

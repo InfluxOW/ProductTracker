@@ -11,16 +11,21 @@ class TrackerInitCommand extends Tracker
 
     public function handle()
     {
-        $this->output->progressStart(Stock::count());
+        try {
+            $this->output->progressStart(Stock::count());
 
-        Stock::each(function($stock) {
-            $stock->track();
-            $this->output->progressAdvance();
-        });
+            Stock::each(function($stock) {
+                $stock->track();
+                $this->output->progressAdvance();
+            });
 
-        $this->output->progressFinish();
+            $this->output->progressFinish();
 
-        $this->showResults();
+            $this->showResults();
+        } catch (\Exception $e) {
+            $this->line(PHP_EOL);
+            $this->error($e->getMessage());
+        }
     }
 
     protected function showResults()

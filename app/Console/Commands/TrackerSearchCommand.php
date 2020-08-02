@@ -69,10 +69,9 @@ class TrackerSearchCommand extends Tracker
     protected function replaceOptionsValues()
     {
         $attributes = $this->retailer->client()->getProductAttributes();
-
         foreach ($this->options as $key => $value) {
             foreach ($attributes as $option => $attribute) {
-                if (str_contains($value, $option)) {
+                if (! is_null($value) && str_contains($value, $option)) {
                     $this->options[$key] = str_replace($option, $attribute, $this->options[$key]);
                 }
             }
@@ -131,6 +130,13 @@ class TrackerSearchCommand extends Tracker
 
     protected function track($item)
     {
+        $this->call('tracker:add', [
+            'product' => $item['name'],
+            'retailer' => $this->retailer->name,
+            'stock' => [
+                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ]
+        ]);
         $product = Product::firstOrCreate(['name' => $item['name']]);
 
         $stock = Stock::firstOrMake([
