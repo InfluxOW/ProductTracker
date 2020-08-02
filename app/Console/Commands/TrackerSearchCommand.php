@@ -34,7 +34,7 @@ class TrackerSearchCommand extends Command
 
             $this->displayResults($products, $pages);
 
-            $this->trackProducts($products);
+            $this->startTracking($products);
 
             $this->line('Thank you for using the app!');
         } catch (\Exception $e) {
@@ -121,7 +121,7 @@ class TrackerSearchCommand extends Command
         $this->info(json_encode($pages));
     }
 
-    protected function trackProducts($products)
+    protected function startTracking($products)
     {
         if ($this->confirm('Do you want to track one of the above results?')) {
             $this->track($this->getItemToTrack($products));

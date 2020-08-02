@@ -2,35 +2,31 @@
 
 namespace App\Console\Commands;
 
-use App\Exceptions\StockException;
+use App\Exceptions\ProductException;
 use App\Product;
 use App\Stock;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class TrackerUntrackCommand extends Command
 {
     protected $signature = 'tracker:untrack
-    {product : Product name or SKU of associated stock}';
-    protected $description = 'Untrack any product or one its stock';
+    { product : Full name or first letters of the product you want to untrack [register matters] }';
+    protected $description = 'Untrack any product';
 
     public function handle()
     {
-        $input = $this->argument('product');
+        try {
+            $product = Product::where('name', 'like', "{$this->argument('product')}%");
 
-        $product = Product::where('name', $input)->first();
-        if (! is_null($product)) {
-            $product->stock->each->delete();
+            if ($product->doesntExist()) {
+                throw new ProductException("Product '{$this->argument('product')}' has not been found.");
+            }
+
+            $product->first()->stock->each->delete();
             $this->info("Selected product has been untracked!");
-            return;
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
         }
-
-        $stock = Stock::where('sku', $input)->first();
-        if (! is_null($stock)) {
-            $stock->delete();
-            $this->info("Selected stock has been untracked!");
-            return;
-        }
-
-        $this->error("Nothing has been found via your request...");
     }
 }
