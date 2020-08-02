@@ -36,7 +36,7 @@ class BestBuyTest extends TestCase
     /** @test */
     public function it_creates_a_proper_stock_status_response()
     {
-        Http::fake(fn() => ['onlineAvailability' => true, 'salePrice' => 299.99, 'url' => '']);
+        Http::fake(fn() => ['onlineAvailability' => true, 'salePrice' => 299.99]);
         $stockStatus = (new BestBuy())->checkAvailability(new Stock());
 
         $this->assertEquals(29999, $stockStatus->price);

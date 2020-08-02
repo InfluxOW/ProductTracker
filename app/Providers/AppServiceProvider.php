@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Builder::macro('findOrMake', function ($attributes) {
+        Builder::macro('firstOrMake', function ($attributes) {
             $model = static::where($attributes);
 
             return $model->exists() ? $model->first() : static::make($attributes);

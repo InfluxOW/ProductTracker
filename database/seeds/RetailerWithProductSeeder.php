@@ -16,7 +16,7 @@ class RetailerWithProductSeeder extends Seeder
     public function run()
     {
         $switch = Product::create(['name' => 'Nintendo Switch']);
-        $bestBuy = Retailer::create(['name' => 'Best Buy']);
+        $bestBuy = Retailer::create(['name' => 'BestBuy']);
 
         $bestBuy->addStock($switch, new Stock([
             'sku' => 6364253,

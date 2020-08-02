@@ -11,6 +11,14 @@ use Illuminate\Support\Str;
 class BestBuy implements Client
 {
     protected $key;
+    protected $attributes = [
+        'sku' => 'sku',
+        'name' => 'name',
+        'price' => 'salePrice',
+        'sku' => 'sku',
+        'sku' => 'sku',
+
+    ];
 
     public function __construct()
     {
@@ -24,11 +32,11 @@ class BestBuy implements Client
         return new StockStatus(
             $results['onlineAvailability'],
             $results['salePrice'] * 100,
-            $results['url']
+            $results['url'] ?? null
         );
     }
 
-    public function search($input, $options)
+    public function search($input, $options): array
     {
         $results = Http::get(
             $this->searchEndpoint($input, $options)
@@ -38,10 +46,20 @@ class BestBuy implements Client
         $pages = ['currentPage' => $results['currentPage'],  'totalPages' => $results['totalPages']];
 
         return [$products, $pages];
-
     }
 
-    protected function productEndpoint($sku): string
+    public function getAttributes(): array
+    {
+        return [
+            'sku' => 'sku',
+            'name' => 'name',
+            'price' => 'salePrice',
+            'url' => 'url',
+            'in_stock' => 'onlineAvailability',
+        ];
+    }
+
+    protected function productEndpoint($sku)
     {
         return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
     }

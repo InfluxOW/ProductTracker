@@ -8,7 +8,7 @@ class StockStatus
     public $price;
     public $url;
 
-    public function __construct(bool $available, int $price, string $url)
+    public function __construct(bool $available, int $price, string $url = null)
     {
         $this->available = $available;
         $this->price = $price;

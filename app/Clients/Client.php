@@ -8,5 +8,6 @@ use App\Stock;
 interface Client
 {
     public function checkAvailability(Stock $stock): StockStatus;
-    public function search($product, $options);
+    public function search($product, $options): array;
+    public function getAttributes(): array;
 }

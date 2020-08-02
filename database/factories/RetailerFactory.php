@@ -10,3 +10,9 @@ $factory->define(Retailer::class, function (Faker $faker) {
         //
     ];
 });
+
+$factory->state(Retailer::class, 'BestBuy', function (Faker $faker) {
+    return [
+        'name' => 'BestBuy',
+    ];
+});

@@ -13,7 +13,10 @@ class ClientFactory
     {
         $class = "App\\Clients\\Implementations\\" . Str::studly($retailer->name);
 
-        throw_if(!class_exists($class), new ClientException("Client not found for {$retailer->name}."));
+        throw_if(
+            ! class_exists($class),
+            new ClientException("Client not found for {$retailer->name}.")
+        );
 
         return (new $class);
     }

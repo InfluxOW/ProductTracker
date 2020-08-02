@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Clients\Helpers\StockStatus;
 use App\Exceptions\ClientException;
 use App\Exceptions\ProductException;
 use App\Exceptions\RetailerException;
@@ -14,54 +15,63 @@ use Illuminate\Support\Str;
 class TrackerSearchCommand extends Command
 {
     protected $signature = 'tracker:search
-    { retailer? : Retailer you want to use }
-    { product? : Name of the product you are looking for }
+    { retailer? : Retailer you want to use. Use `tracker:retailers` to check available retailers. }
+    { product? : Name of the product you are looking for. }
     { --perPage=20 : Items per page <1-100> }
     { --page=1 : Current search page }
     { --filters= : Filter results by any params (e.g. `onlineAvailability=true`) }
     { --sort=salePrice.asc : Sort results by any params }
     { --showAttributes=sku,name,salePrice,onlineAvailability,url : Product attributes that you want to receive }';
+    protected $description = 'Search for a product in the stock of the selected retailer';
 
-    protected $description = 'Search for product in the selected retailer stock';
-    protected $userInput = [];
+    protected $userInput;
     protected $retailer;
 
     public function handle()
     {
-        $this->setRetailer();
-        $this->userInput['product'] = $this->argument('product') ?? $this->ask('What product are you looking for?');
+        try {
+            $this->setInitialData();
 
-        [$products, $pages] = $this->retailer->client()->search(
-            $this->userInput['product'],
-            $this->getSearchOptions()
-        );
+            [$products, $pages] = $this->getSearchResults();
 
-        $this->displayResults($products, $pages);
+            $this->displayResults($products, $pages);
 
-        if ($this->confirm('Do you want to track one of the above results?')) {
-            $this->track($products);
+            $this->trackProducts($products);
+
+            $this->line('Thank you for using the app!');
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
         }
     }
 
-    protected function setRetailer()
+    protected function setInitialData()
     {
         $this->userInput['retailer'] = $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?');
-        $retailer = Retailer::all()->filter(function($retailer) {
-            return $this->retailersMatches($retailer);
-        })->first();
+        $this->retailer = $this->getRetailer();
+        $this->userInput['product'] = $this->argument('product') ?? $this->ask('What product are you looking for?');
+    }
+
+    protected function getRetailer()
+    {
+        $retailer = Retailer::all()
+            ->filter(function($retailer) {
+                return toLowercaseWord($this->userInput['retailer']) === toLowercaseWord($retailer->name);
+            })->first();
 
         throw_if(
             is_null($retailer),
             new RetailerException("Retailer {$this->userInput['retailer']} has not been found.")
         );
 
-        $this->retailer = $retailer;
+        return $retailer;
     }
 
-    protected function retailersMatches($retailer): bool
+    protected function getSearchResults()
     {
-        return Str::lower(Str::studly($this->userInput['retailer'])) ===
-            Str::lower(Str::studly($retailer->name));
+        return $this->retailer->client()->search(
+            $this->userInput['product'],
+            $this->getSearchOptions()
+        );
     }
 
     protected function getSearchOptions()
@@ -84,25 +94,42 @@ class TrackerSearchCommand extends Command
         $this->info(json_encode($pages));
     }
 
-    protected function track($products)
+    protected function trackProducts($products)
     {
-        $sku = $this->ask('Type SKU of the product you want to track');
-        $item = collect($products)
-            ->filter(function ($item) use ($sku) {
-                return $item['sku'] == $sku;
-            })
-            ->first();
+        if ($this->confirm('Do you want to track one of the above results?')) {
+            $this->track($this->getItemToTrack($products));
 
-        throw_if(is_null($item), new ProductException("Product with SKU {$sku} has not been found in the search results"));
+            while ($this->confirm('Do you want to track anything else?')) {
+                $this->track($this->getItemToTrack($products));
+            }
+        }
+    }
 
+    protected function track($item)
+    {
         $product = Product::firstOrCreate(['name' => $item['name']]);
-        $stock = Stock::findOrMake([
+
+        $stock = Stock::firstOrMake([
             'price' => $item['salePrice'],
             'url' => $item['url'],
             'sku' => $item['sku'],
             'in_stock' => $item['onlineAvailability']
         ]);
         $this->retailer->addStock($product, $stock);
+
         $this->info("Product {$product->name} has been tracked!");
+    }
+
+    protected function getItemToTrack($products)
+    {
+        $sku = $this->ask('Enter SKU of the product you want to track');
+        $item = collect($products)->firstWhere('sku', '==', $sku);
+
+        throw_if(
+            is_null($item),
+            new ProductException("Product with SKU {$sku} has not been found in the search results")
+        );
+
+        return $item;
     }
 }
