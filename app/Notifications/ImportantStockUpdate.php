@@ -38,6 +38,7 @@ class ImportantStockUpdate extends Notification
      */
     public function toMail($notifiable)
     {
+        dd($this->stock);
         return (new MailMessage)
             ->subject("Important Stock Update for {$this->stock->product->name}")
             ->line('We have an important update to the product you have been tracking.')

@@ -26,8 +26,8 @@ class TrackStock implements ShouldQueue
     {
         $this->checkAvailability();
 
-        $this->notifyUser();
         $this->refreshStock();
+        $this->notifyUser();
         $this->recordToHistory();
     }
 
