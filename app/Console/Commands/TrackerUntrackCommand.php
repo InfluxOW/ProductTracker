@@ -16,9 +16,10 @@ class TrackerUntrackCommand extends Tracker
         try {
             $product = Product::where('name', 'like', "{$this->argument('product')}%");
 
-            if ($product->doesntExist()) {
-                throw new ProductException("Product '{$this->argument('product')}' has not been found.");
-            }
+            throw_if(
+                $product->doesntExist(),
+                new ProductException("Product '{$this->argument('product')}' has not been found.")
+            );
 
             $product->first()->stock->each->delete();
             $this->info("Selected product has been untracked!");

@@ -20,9 +20,9 @@ class TrackerSearchCommand extends Tracker
     { --attributes=sku,name,price,in_stock,url : Product attributes that you want to receive }';
     protected $description = 'Search for a product in the stock of the selected retailer';
 
-    protected $userInput;
-    protected $retailer;
-    protected $options;
+    protected string $product;
+    protected Retailer $retailer;
+    protected array $options;
 
     public function handle()
     {
@@ -45,16 +45,17 @@ class TrackerSearchCommand extends Tracker
     {
         $this->options = $this->options();
 
-        $this->userInput['retailer'] = $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?');
-        $this->retailer = $this->getRetailer($this->userInput['retailer']);
+        $this->retailer = $this->getRetailer(
+            $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?')
+        );
 
-        $this->userInput['product'] = $this->argument('product') ?? $this->ask('What product are you looking for?');
+        $this->product = $this->argument('product') ?? $this->ask('What product are you looking for?');
     }
 
     protected function getSearchResults()
     {
         return $this->retailer->client()->search(
-            $this->userInput['product'],
+            $this->product,
             $this->getSearchOptions()
         );
     }
@@ -66,21 +67,6 @@ class TrackerSearchCommand extends Tracker
         return $this->options;
     }
 
-    protected function replaceOptionsValues()
-    {
-        $attributes = $this->retailer->client()->getProductAttributes();
-
-        foreach ($this->options as $key => $value) {
-            foreach ($attributes as $option => $attribute) {
-                if (! is_null($value) && str_contains($value, $option)) {
-                    $this->options[$key] = str_replace($option, $attribute, $this->options[$key]);
-                }
-            }
-        }
-
-        return $this;
-    }
-
     protected function replaceOptionsKeys()
     {
         $attributes = $this->retailer->client()->getSearchAttributes();
@@ -90,6 +76,21 @@ class TrackerSearchCommand extends Tracker
 
             if (array_key_exists($key, $attributes)) {
                 $this->options[$attributes[$key]] = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    protected function replaceOptionsValues()
+    {
+        $attributes = $this->retailer->client()->getProductAttributes();
+
+        foreach ($this->options as $key => $value) {
+            foreach ($attributes as $option => $attribute) {
+                if (! is_null($value) && str_contains($value, $option)) {
+                    $this->options[$key] = str_replace($option, $attribute, $this->options[$key]);
+                }
             }
         }
 
@@ -138,10 +139,10 @@ class TrackerSearchCommand extends Tracker
             'product' => $product->name,
             'retailer' => $this->retailer->name,
             'stock' => [
-                'sku' => $stock->sku,
-                'url' => $stock->url,
-                'price' => $stock->price,
-                'in_stock' => $stock->in_stock
+                $stock->sku,
+                $stock->url,
+                $stock->price,
+                $stock->in_stock
             ]
         ]);
     }
