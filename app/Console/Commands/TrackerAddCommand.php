@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\StockException;
 use App\Product;
 use App\Stock;
 
@@ -15,16 +16,30 @@ class TrackerAddCommand extends Tracker
 
     public function handle()
     {
-        $retailer = $this->getRetailer($this->argument('retailer'));
-        $product = Product::firstOrCreate(['name' => $this->argument('product')]);
-        $stock = Stock::firstOrMake([
-            'price' => (int) $this->argument('stock')[2],
-            'url' => (string) $this->argument('stock')[1],
-            'sku' => (int) $this->argument('stock')[0],
-            'in_stock' => (bool) $this->argument('stock')[3]
-        ]);
-        $retailer->addStock($product, $stock);
+        try {
+            $retailer = $this->getRetailer(
+                $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?')
+            );
+            $product = Product::firstOrCreate(
+                ['name' => $this->argument('product') ?? $this->ask('What product do you want to add?')]
+            );
+            $stock = Stock::firstOrMake([
+                'sku' => (int) $this->argument('stock')[0],
+                'url' => (string) $this->argument('stock')[1],
+                'price' => (int) $this->argument('stock')[2],
+                'in_stock' => (bool) $this->argument('stock')[3]
+            ]);
 
-        $this->info("Product {$product->name} has been tracked!");
+            throw_if(
+                is_null($stock->sku),
+                new StockException("Stock should have a sku.")
+            );
+
+            $retailer->addStock($product, $stock);
+
+            $this->info("Product {$product->name} has been tracked!");
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 }

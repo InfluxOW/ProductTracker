@@ -69,6 +69,7 @@ class TrackerSearchCommand extends Tracker
     protected function replaceOptionsValues()
     {
         $attributes = $this->retailer->client()->getProductAttributes();
+
         foreach ($this->options as $key => $value) {
             foreach ($attributes as $option => $attribute) {
                 if (! is_null($value) && str_contains($value, $option)) {
@@ -130,23 +131,34 @@ class TrackerSearchCommand extends Tracker
 
     protected function track($item)
     {
+        $product = Product::firstOrCreate(['name' => $item['name']]);
+        $stock = $this->createStock($item);
+
         $this->call('tracker:add', [
-            'product' => $item['name'],
+            'product' => $product->name,
             'retailer' => $this->retailer->name,
             'stock' => [
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                'sku' => $stock->sku,
+                'url' => $stock->url,
+                'price' => $stock->price,
+                'in_stock' => $stock->in_stock
             ]
         ]);
-        $product = Product::firstOrCreate(['name' => $item['name']]);
+    }
 
-        $stock = Stock::firstOrMake([
-            'price' => $item['salePrice'],
-            'url' => $item['url'],
-            'sku' => $item['sku'],
-            'in_stock' => $item['onlineAvailability']
-        ]);
-        $this->retailer->addStock($product, $stock);
+    protected function createStock(array $item): Stock
+    {
+        $attributes = $this->retailer->client()->getProductAttributes();
 
-        $this->info("Product {$product->name} has been tracked!");
+        foreach ($attributes as $key => $attribute) {
+            foreach ($item as $param => $value) {
+                if ($attribute === $param) {
+                    unset($item[$param]);
+                    $item[$key] = $value;
+                }
+            }
+        }
+
+        return Stock::firstOrMake($item);
     }
 }
