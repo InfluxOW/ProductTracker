@@ -15,12 +15,12 @@ class TrackerInitCommandTest extends TestCase
         Notification::fake();
         $this->seed(RetailerWithProductSeeder::class);
 
-        $this->assertFalse(Product::first()->inStock());
+        $this->assertFalse(Product::first()->in_stock);
 
         $this->mockClientRequest();
 
         $this->artisan('tracker:init');
 
-        $this->assertTrue(Product::first()->inStock());
+        $this->assertTrue(Product::first()->in_stock);
     }
 }

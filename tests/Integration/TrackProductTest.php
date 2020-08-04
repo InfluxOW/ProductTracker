@@ -4,13 +4,14 @@ namespace Tests\Integration;
 
 use App\History;
 use App\Notifications\ImportantProductUpdate;
+use App\Product;
 use App\Stock;
 use App\UseCases\TrackProduct;
 use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
 
-class TrackStockTest extends TestCase
+class TrackProductTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -22,7 +23,7 @@ class TrackStockTest extends TestCase
 
         $this->seed(RetailerWithProductSeeder::class);
 
-        (new TrackProduct(Stock::first()))->handle();
+        Product::first()->track();
     }
 
     /** @test */
@@ -34,7 +35,7 @@ class TrackStockTest extends TestCase
     /** @test */
     public function it_refreshes_the_local_stock()
     {
-        $this->assertDatabaseHas('stock', [
+        $this->assertDatabaseHas('products', [
             'price' => 24900,
             'in_stock' => true
         ]);

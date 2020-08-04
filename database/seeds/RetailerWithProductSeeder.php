@@ -15,12 +15,12 @@ class RetailerWithProductSeeder extends Seeder
      */
     public function run()
     {
-        $switch = Product::create(['name' => 'Nintendo Switch']);
         $bestBuy = Retailer::create(['name' => 'BestBuy']);
-
-        $bestBuy->addStock($switch, new Stock([
-            'sku' => 6364253,
-        ]));
+        $switch = $bestBuy->products()->create([
+            'name' => 'Nintendo Switch',
+            'sku' => 6364253, // Nintendo Switch SKU
+            'in_stock' => false,
+        ]);
 
         factory(User::class)->create(['name' => 'admin', 'email' => 'admin@admin.com']);
     }

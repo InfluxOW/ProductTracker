@@ -22,12 +22,10 @@ class ProductHistoryTest extends TestCase
         $product->track();
         $this->assertCount(1, $product->fresh()->history);
 
-        $stock = $product->fresh()->stock->first();
         $history = $product->fresh()->history->first();
-        $this->assertEquals($stock->price, $history->price);
-        $this->assertEquals($stock->in_stock, $history->in_stock);
-        $this->assertEquals($stock->product_id, $history->product_id);
-        $this->assertEquals($stock->id, $history->stock_id);
+        $this->assertEquals($product->fresh()->price, $history->price);
+        $this->assertEquals($product->fresh()->in_stock, $history->in_stock);
+        $this->assertEquals($product->fresh()->id, $history->product_id);
 
     }
 }

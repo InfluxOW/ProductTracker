@@ -2,7 +2,7 @@
 
 namespace Tests\Clients;
 
-use App\Stock;
+use App\Product;
 use App\Clients\Implementations\BestBuy;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -21,13 +21,8 @@ class BestBuyTest extends TestCase
     {
         $this->seed(RetailerWithProductSeeder::class);
 
-        $stock = Stock::first();
-        $stock->update([
-            'sku' => '6364253', // Nintendo Switch SKU
-        ]);
-
         try {
-            (new BestBuy())->checkAvailability($stock);
+            (new BestBuy())->checkAvailability(Product::first());
         } catch (\Exception $e) {
             $this->fail('Failed to track the BestBuy API properly.' . $e->getMessage());
         }
@@ -37,9 +32,9 @@ class BestBuyTest extends TestCase
     public function it_creates_a_proper_stock_status_response()
     {
         Http::fake(fn() => ['onlineAvailability' => true, 'salePrice' => 299.99, 'url' => '']);
-        $stockStatus = (new BestBuy())->checkAvailability(new Stock());
+        $productStatus = (new BestBuy())->checkAvailability(new Product());
 
-        $this->assertEquals(29999, $stockStatus->price);
-        $this->assertTrue($stockStatus->available);
+        $this->assertEquals(29999, $productStatus->price);
+        $this->assertTrue($productStatus->available);
     }
 }

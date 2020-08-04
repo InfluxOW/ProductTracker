@@ -35,7 +35,7 @@ class TrackProduct implements ShouldQueue
     protected function checkAvailability()
     {
         $client = $this->product->retailer->client();
-        
+
         $this->status = $client->checkAvailability($this->product);
     }
 
@@ -51,7 +51,7 @@ class TrackProduct implements ShouldQueue
 
     protected function isNowInStock()
     {
-        return $this->product->in_stock !== false && $this->status->available;
+        return ! $this->product->in_stock && $this->status->available;
     }
 
     protected function refreshStock()

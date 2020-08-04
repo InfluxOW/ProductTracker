@@ -2,30 +2,56 @@
 
 namespace Tests\Unit;
 
+use App\Exceptions\ClientException;
 use App\Product;
 use App\Retailer;
-use App\Stock;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\UseCases\TrackProduct;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use RetailerWithProductSeeder;
 use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
     /** @test */
-    public function it_checks_stock_for_products_at_retailers()
+    public function it_can_be_tracked()
     {
-        $switch = Product::create(['name' => 'Nintendo Switch']);
-        $bestBuy = Retailer::create(['name' => 'Best Buy']);
+        Bus::fake();
 
-        $this->assertFalse($switch->inStock());
+        Product::first()->track();
 
-        $stock = new Stock([
-            'price' => 10000,
-            'url' => 'http://foobar.example',
-            'sku' => 12345,
-            'in_stock' => true
-        ]);
+        Bus::assertDispatched(TrackProduct::class);
+    }
 
-        $bestBuy->addStock($switch, $stock);
-        $this->assertTrue($switch->inStock());
+    /** @test */
+    public function it_throws_an_exception_if_a_client_is_not_found_when_tracking()
+    {
+        Retailer::first()->update(['name' => 'Fake Retailer']);
+
+        $this->expectException(ClientException::class);
+
+        Product::first()->track();
+    }
+
+    /** @test */
+    public function it_updates_its_details_after_being_tracked()
+    {
+        Notification::fake();
+        $this->mockClientRequest($available = true, $price = 9900, $url = 'http://fake.test');
+
+        $product = Product::first();
+        $product->track();
+
+        $this->assertEquals($available, $product->fresh()->in_stock);
+        $this->assertEquals($price, $product->fresh()->price);
+        $this->assertEquals($url, $product->fresh()->url);
+
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(RetailerWithProductSeeder::class);
     }
 }

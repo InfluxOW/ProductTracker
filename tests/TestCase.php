@@ -12,9 +12,9 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
     use RefreshDatabase;
 
-    protected function mockClientRequest($available = true, $price = 29900)
+    protected function mockClientRequest($available = true, $price = 29900, $url = null)
     {
         ClientFactory::shouldReceive('make->checkAvailability')
-            ->andReturn(new ProductStatus($available, $price));
+            ->andReturn(new ProductStatus($available, $price, $url));
     }
 }
