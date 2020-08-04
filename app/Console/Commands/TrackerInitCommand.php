@@ -7,7 +7,7 @@ use App\Product;
 class TrackerInitCommand extends Tracker
 {
     protected $signature = 'tracker:init';
-    protected $description = 'Initialize tracking on every project';
+    protected $description = 'Initialize tracking on every product';
 
     public function handle()
     {
@@ -30,11 +30,9 @@ class TrackerInitCommand extends Tracker
 
     protected function showResults()
     {
-        $data = Product::get($this->keys());
-
         $this->table(
             $this->keys(),
-            $data
+            Product::get($this->keys())
         );
     }
 

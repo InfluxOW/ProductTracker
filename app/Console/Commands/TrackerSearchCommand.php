@@ -33,8 +33,6 @@ class TrackerSearchCommand extends Tracker
             $this->displayResults($products, $pages);
 
             $this->startTracking($products);
-
-            $this->line('Thank you for using the app!');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }

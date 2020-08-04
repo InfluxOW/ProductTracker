@@ -1,7 +1,7 @@
 {
-    "name": "influx/stock-tracker",
+    "name": "influx/product-tracker",
     "type": "project",
-    "description": "Stock Tracker App",
+    "description": "Product Tracker App",
     "keywords": [
         "laravel",
         "project"
