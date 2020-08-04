@@ -13,19 +13,15 @@ class TrackerUntrackCommand extends Tracker
 
     public function handle()
     {
-        try {
-            $name = $this->argument('product') ?? $this->ask('Enter full name or first letters of the product you want to untrack [register matters]');
-            $product = Product::where('name', 'like', "{$name}%");
+        $name = $this->argument('product') ?? $this->ask('Enter full name or first letters of the product you want to untrack [register matters]');
+        $product = Product::where('name', 'like', "{$name}%");
 
-            throw_if(
-                $product->doesntExist(),
-                new ProductException("Product '{$name}' has not been found.")
-            );
+        throw_if(
+            $product->doesntExist(),
+            new ProductException("Product '{$name}' has not been found.")
+        );
 
-            $product->first()->delete();
-            $this->info("Selected product has been untracked!");
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $product->first()->delete();
+        $this->info("Selected product has been untracked!");
     }
 }

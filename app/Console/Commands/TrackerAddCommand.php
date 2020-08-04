@@ -15,13 +15,9 @@ class TrackerAddCommand extends Tracker
 
     public function handle()
     {
-        try {
-            $product = $this->getProduct();
+        $product = $this->getProduct();
 
-            $this->info("Product {$product->name} has been tracked!");
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $this->info("Product {$product->name} has been tracked!");
     }
 
     protected function getProduct()

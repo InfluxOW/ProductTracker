@@ -1,10 +1,12 @@
-<?php
+<?php /** @noinspection PhpVoidFunctionResultUsedInspection */
 
 namespace App\Console\Commands;
 
 use App\Exceptions\RetailerException;
 use App\Retailer;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Tracker extends Command
 {
@@ -22,4 +24,14 @@ abstract class Tracker extends Command
 
         return $retailer;
     }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        try {
+            return (int) $this->handle();
+        } catch (\Exception $e) {
+            return (int) $this->error($e->getMessage());
+        }
+    }
+
 }

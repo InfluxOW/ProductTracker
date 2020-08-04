@@ -25,17 +25,13 @@ class TrackerSearchCommand extends Tracker
 
     public function handle()
     {
-        try {
-            $this->setInitialData();
+        $this->setInitialData();
 
-            [$products, $pages] = $this->getSearchResults();
+        [$products, $pages] = $this->getSearchResults();
 
-            $this->displayResults($products, $pages);
+        $this->displayResults($products, $pages);
 
-            $this->startTracking($products);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $this->startTracking($products);
     }
 
     protected function setInitialData()
