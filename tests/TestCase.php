@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Clients\Helpers\StockStatus;
+use App\Clients\Helpers\ProductStatus;
 use Facades\App\Clients\ClientFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -15,6 +15,6 @@ abstract class TestCase extends BaseTestCase
     protected function mockClientRequest($available = true, $price = 29900)
     {
         ClientFactory::shouldReceive('make->checkAvailability')
-            ->andReturn(new StockStatus($available, $price));
+            ->andReturn(new ProductStatus($available, $price));
     }
 }

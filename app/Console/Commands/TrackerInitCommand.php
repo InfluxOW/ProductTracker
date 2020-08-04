@@ -2,20 +2,20 @@
 
 namespace App\Console\Commands;
 
-use App\Stock;
+use App\Product;
 
 class TrackerInitCommand extends Tracker
 {
     protected $signature = 'tracker:init';
-    protected $description = 'Track all products stock';
+    protected $description = 'Initialize tracking on every project';
 
     public function handle()
     {
         try {
-            $this->output->progressStart(Stock::count());
+            $this->output->progressStart(Product::count());
 
-            Stock::each(function($stock) {
-                $stock->track();
+            Product::each(function($product) {
+                $product->track();
                 $this->output->progressAdvance();
             });
 
@@ -30,9 +30,7 @@ class TrackerInitCommand extends Tracker
 
     protected function showResults()
     {
-        $data = Stock::query()
-            ->leftJoin('products', 'products.id', '=', 'stock.product_id')
-            ->get($this->keys());
+        $data = Product::get($this->keys());
 
         $this->table(
             $this->keys(),

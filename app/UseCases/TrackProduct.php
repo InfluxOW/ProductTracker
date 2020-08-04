@@ -2,24 +2,25 @@
 
 namespace App\UseCases;
 
-use App\Clients\Helpers\StockStatus;
+use App\Clients\Helpers\ProductStatus;
 use App\History;
-use App\Notifications\ImportantStockUpdate;
+use App\Notifications\ImportantProductUpdate;
+use App\Product;
 use App\Stock;
 use App\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class TrackStock implements ShouldQueue
+class TrackProduct implements ShouldQueue
 {
     use Dispatchable;
 
-    protected Stock $stock;
-    protected StockStatus $status;
+    protected Product $product;
+    protected ProductStatus $status;
 
-    public function __construct(Stock $stock)
+    public function __construct(Product $product)
     {
-        $this->stock = $stock;
+        $this->product = $product;
     }
 
     public function handle()
@@ -33,16 +34,16 @@ class TrackStock implements ShouldQueue
 
     protected function checkAvailability()
     {
-        $this->status = $this->stock->retailer
-            ->client()
-            ->checkAvailability($this->stock);
+        $client = $this->product->retailer->client();
+        
+        $this->status = $client->checkAvailability($this->product);
     }
 
     protected function notifyUser()
     {
         if ($this->isNowInStock()) {
             User::first()->notify(
-                new ImportantStockUpdate($this->stock)
+                new ImportantProductUpdate($this->product)
             );
         }
 
@@ -50,12 +51,12 @@ class TrackStock implements ShouldQueue
 
     protected function isNowInStock()
     {
-        return $this->stock->in_stock !== false && $this->status->available;
+        return $this->product->in_stock !== false && $this->status->available;
     }
 
     protected function refreshStock()
     {
-        $this->stock->update([
+        $this->product->update([
             'in_stock' => $this->status->available,
             'price' => $this->status->price,
             'url' => $this->status->url
@@ -64,11 +65,10 @@ class TrackStock implements ShouldQueue
 
     protected function recordToHistory()
     {
-        History::create([
-            'price' => $this->stock->price,
-            'in_stock' => $this->stock->in_stock,
-            'stock_id' => $this->stock->id,
-            'product_id' => $this->stock->product_id,
+        $history = History::make([
+            'price' => $this->product->price,
+            'in_stock' => $this->product->in_stock,
         ]);
+        $this->product->history()->save($history);
     }
 }

@@ -3,9 +3,9 @@
 namespace Tests\Integration;
 
 use App\History;
-use App\Notifications\ImportantStockUpdate;
+use App\Notifications\ImportantProductUpdate;
 use App\Stock;
-use App\UseCases\TrackStock;
+use App\UseCases\TrackProduct;
 use Illuminate\Support\Facades\Notification;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
@@ -22,13 +22,13 @@ class TrackStockTest extends TestCase
 
         $this->seed(RetailerWithProductSeeder::class);
 
-        (new TrackStock(Stock::first()))->handle();
+        (new TrackProduct(Stock::first()))->handle();
     }
 
     /** @test */
     public function it_notifies_the_user()
     {
-        Notification::assertTimesSent(1, ImportantStockUpdate::class);
+        Notification::assertTimesSent(1, ImportantProductUpdate::class);
     }
 
     /** @test */

@@ -9,15 +9,9 @@ class Retailer extends Model
 {
     protected $fillable = ['name'];
 
-    public function addStock(Product $product, Stock $stock)
+    public function products()
     {
-        $stock->product()->associate($product);
-        $this->stock()->save($stock);
-    }
-
-    public function stock()
-    {
-        return $this->hasMany(Stock::class);
+        return $this->hasMany(Product::class);
     }
 
     public function client()

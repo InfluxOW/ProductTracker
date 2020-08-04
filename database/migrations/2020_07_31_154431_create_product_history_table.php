@@ -16,7 +16,6 @@ class CreateProductHistoryTable extends Migration
         Schema::create('product_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('stock_id')->constrained('stock')->cascadeOnDelete();
             $table->unsignedInteger('price');
             $table->boolean('in_stock');
             $table->timestamps();

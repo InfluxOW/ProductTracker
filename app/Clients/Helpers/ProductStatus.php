@@ -2,7 +2,7 @@
 
 namespace App\Clients\Helpers;
 
-class StockStatus
+class ProductStatus
 {
     public $available;
     public $price;

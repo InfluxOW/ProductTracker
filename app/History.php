@@ -6,16 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class History extends Model
 {
-    protected $fillable = ['price', 'in_stock', 'product_id', 'stock_id'];
+    protected $fillable = ['price', 'in_stock'];
     protected $table = 'product_history';
 
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function stock()
-    {
-        return $this->belongsTo(Stock::class);
     }
 }

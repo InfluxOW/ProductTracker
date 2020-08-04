@@ -2,13 +2,13 @@
 
 namespace App\Clients;
 
-use App\Clients\Helpers\StockStatus;
-use App\Stock;
+use App\Clients\Helpers\ProductStatus;
+use App\Product;
 
 interface Client
 {
     /* Actions */
-    public function checkAvailability(Stock $stock): StockStatus;
+    public function checkAvailability(Product $product): ProductStatus;
     public function search($product, $options): array;
 
     /* Endpoints */

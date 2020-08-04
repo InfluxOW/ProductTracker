@@ -6,7 +6,6 @@ use App\Exceptions\ProductException;
 use App\Exceptions\RetailerException;
 use App\Product;
 use App\Retailer;
-use App\Stock;
 
 class TrackerSearchCommand extends Tracker
 {
