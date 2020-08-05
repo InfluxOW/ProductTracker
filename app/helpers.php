@@ -21,3 +21,16 @@ function getFilesInfo($dir)
 function toLowercaseWord(string $string) : string {
     return Str::of($string)->replace(' ', '')->lower();
 }
+
+function validateInput($rules, $fieldName, $value)
+{
+    $validator = Validator::make([
+        $fieldName => $value
+    ], [
+        $fieldName => $rules
+    ]);
+
+    return $validator->fails()
+        ? $validator->errors()->first($fieldName)
+        : null;
+}

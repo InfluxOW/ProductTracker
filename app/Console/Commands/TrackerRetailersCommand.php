@@ -9,12 +9,7 @@ class TrackerRetailersCommand extends Tracker
 
     public function handle()
     {
-        $retailers = collect(
-            getFilesInfo(app_path('Clients/Implementations'))
-        )
-            ->map->getFilenameWithoutExtension();
-
         $this->line("Currently available retailers are...");
-        $this->info(json_encode($retailers));
+        $this->info(json_encode($this->retailers()));
     }
 }

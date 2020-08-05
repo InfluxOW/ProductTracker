@@ -34,13 +34,6 @@ class BestBuy implements Client
         );
     }
 
-    public function productEndpoint(...$params): string
-    {
-        [$sku] = $params;
-
-        return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
-    }
-
     public function search($input, $options): array
     {
         $results = Http::get($this->searchEndpoint($input, $options))->json();
@@ -51,6 +44,13 @@ class BestBuy implements Client
         return [$products, $pages];
 
         return new SearchResults($results);
+    }
+
+    public function productEndpoint(...$params): string
+    {
+        [$sku] = $params;
+
+        return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
     }
 
     public function searchEndpoint(...$params): string

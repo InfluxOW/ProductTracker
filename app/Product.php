@@ -26,23 +26,4 @@ class Product extends Model
     {
         TrackProduct::dispatch($this);
     }
-
-    /*
-     * Mutators
-     * */
-
-    public function setPriceAttribute($value)
-    {
-        $this->attributes['price'] = (int) $value;
-    }
-
-    public function setSkuAttribute($value)
-    {
-        $this->attributes['sku'] = (int) $value;
-    }
-
-    public function setInStockAttribute($value)
-    {
-        $this->attributes['in_stock'] = (bool) $value;
-    }
 }

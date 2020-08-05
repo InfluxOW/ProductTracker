@@ -34,4 +34,12 @@ abstract class Tracker extends Command
         }
     }
 
+    protected function retailers()
+    {
+        return collect(
+            getFilesInfo(app_path('Clients/Implementations'))
+        )
+            ->map->getFilenameWithoutExtension()->toArray();
+    }
+
 }
