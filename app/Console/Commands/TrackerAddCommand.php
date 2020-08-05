@@ -61,8 +61,6 @@ class TrackerAddCommand extends Tracker
         ];
         $validator = Validator::make($attributes, $this->productValidationRules());
 
-        dump($attributes);
-
         if ($validator->fails()) {
             foreach ($validator->errors()->all() as $error) {
                 $this->error($error);

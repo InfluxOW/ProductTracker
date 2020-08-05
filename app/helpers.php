@@ -35,7 +35,7 @@ function validateInput($rules, $fieldName, $value)
         : null;
 }
 
-function replaceKeysWithMapper($data, $mapper, $unsetNotFoundKeys = true)
+function replaceArrayKeysWithMapper(array $data, array $mapper, $unsetNotFoundKeys = true)
 {
     foreach ($data as $key => $value) {
         if ($unsetNotFoundKeys) {
@@ -50,7 +50,7 @@ function replaceKeysWithMapper($data, $mapper, $unsetNotFoundKeys = true)
     return $data;
 }
 
-function replaceValuesWithMapper($data, $mapper)
+function replaceArrayValuesWithMapper(array $data, array $mapper)
 {
     foreach ($data as $key => $value) {
         foreach ($mapper as $option => $attribute) {

@@ -4,13 +4,11 @@ test-coverage:
 	php artisan test --coverage-clover build/logs/clover.xml
 install:
 	composer install
-setup:
-	install
+setup:	install
 	cp -n .env.example .env || true
 	php artisan key:generate
 	touch database/database.sqlite
 	php artisan migrate
-	seed
 seed:
 	php artisan db:seed
 clear:

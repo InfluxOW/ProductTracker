@@ -24,11 +24,11 @@ class TrackerSearchCommand extends Tracker
     {
         $this->setInitialData();
 
-        [$products, $pages] = $this->getSearchResults();
+        $results = $this->getSearchResults();
 
-        $this->displayResults($products, $pages);
+        $this->displayResults($results);
 
-        $this->startTracking($products);
+        $this->startTracking($results->products);
     }
 
     protected function setInitialData()
@@ -50,17 +50,17 @@ class TrackerSearchCommand extends Tracker
 
     protected function transformSearchOptions()
     {
-        $optionsWithCorrectKeys = replaceKeysWithMapper($this->options(), $this->retailer->client()->getSearchAttributes());
-        return replaceValuesWithMapper($optionsWithCorrectKeys, $this->retailer->client()->getProductAttributes());
+        $optionsWithCorrectKeys = replaceArrayKeysWithMapper($this->options(), $this->retailer->client()->getSearchAttributes());
+        return replaceArrayValuesWithMapper($optionsWithCorrectKeys, $this->retailer->client()->getProductAttributes());
     }
 
-    protected function displayResults($products, $pages)
+    protected function displayResults($results)
     {
         $this->table(
-            array_keys($products[0]),
-            $products
+            array_keys($results->products[0]),
+            $results->products
         );
-        $this->info(json_encode($pages));
+        $this->info(json_encode($results->pagination));
     }
 
     protected function startTracking($products)
@@ -89,16 +89,14 @@ class TrackerSearchCommand extends Tracker
 
     protected function track($item)
     {
-        $product = $this->transformApiProductAttributesToDbAttributes($item);
-
         $this->call('tracker:add', [
             'retailer' => $this->retailer->name,
             'product' => [
-                $product['name'],
-                $product['sku'],
-                $product['url'],
-                $product['price'],
-                $product['in_stock'],
+                $item['name'],
+                $item['sku'],
+                $item['url'] ?? null,
+                $item['price'] ?? null,
+                $item['in_stock'] ?? null,
             ]
         ]);
     }

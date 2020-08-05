@@ -5,6 +5,7 @@ namespace App\Clients\Implementations;
 use App\Clients\Client;
 use App\Clients\Helpers\ProductStatus;
 use App\Clients\Helpers\SearchItem;
+use App\Clients\Helpers\SearchPagination;
 use App\Clients\Helpers\SearchResults;
 use App\Console\Commands\Tracker;
 use App\Exceptions\ApiException;
@@ -40,11 +41,12 @@ class BestBuy implements Client
     {
         $results = Http::get($this->searchEndpoint($input, $options))->json();
 
-        $products = [];
-        foreach ($results['products'] as $product) {
-            $products[] = replaceKeysWithMapper($product, array_flip($this->getProductAttributes()));
-        }
-        $pagination = ['currentPage' => $results['currentPage'], 'totalPages' => $results['totalPages']];
+        $products = array_reduce($results['products'], function ($carry, $product) {
+            $carry[] = replaceArrayKeysWithMapper($product, array_flip($this->getProductAttributes()));
+            return $carry;
+        }, []);
+
+        $pagination = new SearchPagination($results['currentPage'], $results['totalPages']);
 
         return new SearchResults($products, $pagination);
     }
@@ -90,6 +92,7 @@ class BestBuy implements Client
             'price' => 'salePrice',
             'url' => 'url',
             'in_stock' => 'onlineAvailability',
+            'releaseDate' => 'releaseDate'
         ];
     }
 

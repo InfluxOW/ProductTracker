@@ -2,14 +2,12 @@
 
 namespace App\Clients\Helpers;
 
-use Illuminate\Database\Eloquent\Collection;
-
 class SearchResults
 {
-    public Collection $products;
-    public array $pagination;
+    public array $products;
+    public SearchPagination $pagination;
 
-    public function __construct(Collection $products, array $pagination)
+    public function __construct(array $products, SearchPagination $pagination)
     {
         $this->products = $products;
         $this->pagination = $pagination;
