@@ -46,7 +46,6 @@ class TrackProduct implements ShouldQueue
                 new ImportantProductUpdate($this->product)
             );
         }
-
     }
 
     protected function isNowInStock()

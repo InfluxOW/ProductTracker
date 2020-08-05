@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ProductException;
-use App\Exceptions\RetailerException;
 use App\Product;
 use App\Retailer;
 
@@ -14,7 +13,7 @@ class TrackerSearchCommand extends Tracker
     { product? : Name of the product you are looking for. }
     { --per=20 : Items per page <1-100> }
     { --page=1 : Current search page }
-    { --filters= : Filter results by any params (e.g. `onlineAvailability=true`) }
+    { --filters= : Filter results by any params (e.g. `in_stock=true`) }
     { --sort=price.asc : Sort results by any params }
     { --attributes=sku,name,price,in_stock,url : Product attributes that you want to receive }';
     protected $description = 'Search for a product in the stock of the selected retailer';
@@ -39,7 +38,7 @@ class TrackerSearchCommand extends Tracker
         $this->options = $this->options();
 
         $this->retailer = $this->getRetailer(
-            $this->argument('retailer') ?? $this->ask('Which retailer do you want to use?')
+            $this->argument('retailer') ?? $this->choice('Which retailer do you want to use?', $this->retailers())
         );
 
         $this->product = $this->argument('product') ?? $this->ask('What product are you looking for?');
@@ -112,7 +111,7 @@ class TrackerSearchCommand extends Tracker
 
     protected function getItemToTrack($products)
     {
-        $sku = $this->ask('Enter SKU of the product you want to track');
+        $sku = $this->askWithValidation('Enter SKU of the product you want to track', 'sku', $this->productValidationRules()['sku']);
         $item = collect($products)->firstWhere('sku', '==', $sku);
 
         throw_if(
@@ -125,22 +124,21 @@ class TrackerSearchCommand extends Tracker
 
     protected function track($item)
     {
-        $product = Product::firstOrCreate(['name' => $item['name']]);
-        $stock = $this->createStock($item);
+        $product = $this->transformApiProductAttributesToDbAttributes($item);
 
         $this->call('tracker:add', [
-            'product' => $product->name,
             'retailer' => $this->retailer->name,
-            'stock' => [
-                $stock->sku,
-                $stock->url,
-                $stock->price,
-                $stock->in_stock
+            'product' => [
+                $product['name'],
+                $product['sku'],
+                $product['url'],
+                $product['price'],
+                $product['in_stock'],
             ]
         ]);
     }
 
-    protected function createStock(array $item): Stock
+    protected function transformApiProductAttributesToDbAttributes($item)
     {
         $attributes = $this->retailer->client()->getProductAttributes();
 
@@ -153,6 +151,6 @@ class TrackerSearchCommand extends Tracker
             }
         }
 
-        return Stock::firstOrMake($item);
+        return $item;
     }
 }

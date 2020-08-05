@@ -36,7 +36,7 @@ class TrackerAddCommand extends Tracker
 
     protected function askAboutProduct()
     {
-        $rules = $this->validationRules();
+        $rules = $this->productValidationRules();
         $attributes['name'] =  $this->askWithValidation('What product do you want to add?', 'name', $rules['name']);
         $attributes['sku'] = $this->askWithValidation('Enter SKU of the product', 'sku', $rules['sku']);
 
@@ -52,14 +52,16 @@ class TrackerAddCommand extends Tracker
 
     protected function getProductAttributesFromCommandArguments()
     {
-        $product = [
+        $attributes = [
             'name' => $this->argument('product')[0] ?? null,
             'sku' => $this->argument('product')[1] ?? null,
             'url' => $this->argument('product')[2] ?? null,
             'price' => $this->argument('product')[3] ?? null,
             'in_stock' => $this->argument('product')[4] ?? null
         ];
-        $validator = Validator::make($product, $this->validationRules());
+        $validator = Validator::make($attributes, $this->productValidationRules());
+
+        dump($attributes);
 
         if ($validator->fails()) {
             foreach ($validator->errors()->all() as $error) {
@@ -68,17 +70,6 @@ class TrackerAddCommand extends Tracker
             exit();
         }
 
-        return $product;
-    }
-
-    protected function validationRules()
-    {
-        return [
-            'name' => ['required', 'string', 'min:3'],
-            'sku' => ['required', 'integer', 'min:0'],
-            'url' => ['nullable', 'url'],
-            'price' => ['nullable', 'integer', 'min:0'],
-            'in_stock' => ['nullable', 'boolean']
-        ];
+        return $attributes;
     }
 }
