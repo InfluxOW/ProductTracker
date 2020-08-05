@@ -42,7 +42,6 @@ abstract class Tracker extends Command
         }, getFilesInfo(app_path('Clients/Implementations')));
     }
 
-
     protected function productValidationRules()
     {
         return [

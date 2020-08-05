@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ProductException;
-use App\Product;
 use App\Retailer;
 
 class TrackerSearchCommand extends Tracker
@@ -20,7 +19,6 @@ class TrackerSearchCommand extends Tracker
 
     protected string $product;
     protected Retailer $retailer;
-    protected array $options;
 
     public function handle()
     {
@@ -35,8 +33,6 @@ class TrackerSearchCommand extends Tracker
 
     protected function setInitialData()
     {
-        $this->options = $this->options();
-
         $this->retailer = $this->getRetailer(
             $this->argument('retailer') ?? $this->choice('Which retailer do you want to use?', $this->retailers())
         );
@@ -48,45 +44,14 @@ class TrackerSearchCommand extends Tracker
     {
         return $this->retailer->client()->search(
             $this->product,
-            $this->getSearchOptions()
+            $this->transformSearchOptions()
         );
     }
 
-    protected function getSearchOptions()
+    protected function transformSearchOptions()
     {
-        $this->replaceOptionsKeys()->replaceOptionsValues();
-
-        return $this->options;
-    }
-
-    protected function replaceOptionsKeys()
-    {
-        $attributes = $this->retailer->client()->getSearchAttributes();
-
-        foreach ($this->options as $key => $value) {
-            unset($this->options[$key]);
-
-            if (array_key_exists($key, $attributes)) {
-                $this->options[$attributes[$key]] = $value;
-            }
-        }
-
-        return $this;
-    }
-
-    protected function replaceOptionsValues()
-    {
-        $attributes = $this->retailer->client()->getProductAttributes();
-
-        foreach ($this->options as $key => $value) {
-            foreach ($attributes as $option => $attribute) {
-                if (! is_null($value) && str_contains($value, $option)) {
-                    $this->options[$key] = str_replace($option, $attribute, $this->options[$key]);
-                }
-            }
-        }
-
-        return $this;
+        $optionsWithCorrectKeys = replaceKeysWithMapper($this->options(), $this->retailer->client()->getSearchAttributes());
+        return replaceValuesWithMapper($optionsWithCorrectKeys, $this->retailer->client()->getProductAttributes());
     }
 
     protected function displayResults($products, $pages)
@@ -136,21 +101,5 @@ class TrackerSearchCommand extends Tracker
                 $product['in_stock'],
             ]
         ]);
-    }
-
-    protected function transformApiProductAttributesToDbAttributes($item)
-    {
-        $attributes = $this->retailer->client()->getProductAttributes();
-
-        foreach ($attributes as $key => $attribute) {
-            foreach ($item as $param => $value) {
-                if ($attribute === $param) {
-                    unset($item[$param]);
-                    $item[$key] = $value;
-                }
-            }
-        }
-
-        return $item;
     }
 }

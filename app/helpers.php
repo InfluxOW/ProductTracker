@@ -34,3 +34,31 @@ function validateInput($rules, $fieldName, $value)
         ? $validator->errors()->first($fieldName)
         : null;
 }
+
+function replaceKeysWithMapper($data, $mapper, $unsetNotFoundKeys = true)
+{
+    foreach ($data as $key => $value) {
+        if ($unsetNotFoundKeys) {
+            unset($data[$key]);
+        }
+
+        if (array_key_exists($key, $mapper)) {
+            $data[$mapper[$key]] = $value;
+        }
+    }
+
+    return $data;
+}
+
+function replaceValuesWithMapper($data, $mapper)
+{
+    foreach ($data as $key => $value) {
+        foreach ($mapper as $option => $attribute) {
+            if (! is_null($value) && str_contains($value, $option)) {
+                $data[$key] = str_replace($option, $attribute, $data[$key]);
+            }
+        }
+    }
+
+    return $data;
+}

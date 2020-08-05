@@ -3,13 +3,14 @@
 namespace App\Clients;
 
 use App\Clients\Helpers\ProductStatus;
+use App\Clients\Helpers\SearchResults;
 use App\Product;
 
 interface Client
 {
     /* Actions */
     public function checkAvailability(Product $product): ProductStatus;
-    public function search($product, $options): array;
+    public function search($product, $options): SearchResults;
 
     /* Endpoints */
     public function productEndpoint(...$params): string;

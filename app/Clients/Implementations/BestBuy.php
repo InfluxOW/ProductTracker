@@ -4,7 +4,9 @@ namespace App\Clients\Implementations;
 
 use App\Clients\Client;
 use App\Clients\Helpers\ProductStatus;
+use App\Clients\Helpers\SearchItem;
 use App\Clients\Helpers\SearchResults;
+use App\Console\Commands\Tracker;
 use App\Exceptions\ApiException;
 use App\Product;
 use Illuminate\Support\Facades\Http;
@@ -34,16 +36,17 @@ class BestBuy implements Client
         );
     }
 
-    public function search($input, $options): array
+    public function search($input, $options): SearchResults
     {
         $results = Http::get($this->searchEndpoint($input, $options))->json();
 
-        $products = $results['products'];
-        $pages = ['currentPage' => $results['currentPage'], 'totalPages' => $results['totalPages']];
+        $products = [];
+        foreach ($results['products'] as $product) {
+            $products[] = replaceKeysWithMapper($product, array_flip($this->getProductAttributes()));
+        }
+        $pagination = ['currentPage' => $results['currentPage'], 'totalPages' => $results['totalPages']];
 
-        return [$products, $pages];
-
-        return new SearchResults($results);
+        return new SearchResults($products, $pagination);
     }
 
     public function productEndpoint(...$params): string
@@ -59,9 +62,9 @@ class BestBuy implements Client
 
         $query = http_build_query([
             'format' => 'json',
-            'show' => $options['showAttributes'],
+            'show' => $options['show'],
             'sort' => $options['sort'],
-            'pageSize' => $options['perPage'],
+            'pageSize' => $options['pageSize'],
             'page' => $options['page'],
             'apiKey' => $this->key
         ]);
@@ -93,11 +96,11 @@ class BestBuy implements Client
     public function getSearchAttributes(): array
     {
         return [
-            'per' => 'perPage',
+            'per' => 'pageSize',
             'page' => 'page',
             'filters' => 'filters',
             'sort' => 'sort',
-            'attributes' => 'showAttributes',
+            'attributes' => 'show',
         ];
     }
 }
