@@ -13,9 +13,11 @@ abstract class Tracker extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            return (int) $this->handle();
+            $this->handle();
+            return 0;
         } catch (\Exception $e) {
-            return (int) $this->error($e->getMessage());
+            $this->error($e->getMessage());
+            return 1;
         }
     }
 

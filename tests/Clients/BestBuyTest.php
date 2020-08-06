@@ -13,7 +13,6 @@ use RetailerWithProductSeeder;
  */
 class BestBuyTest extends TestCase
 {
-
     /** @test
      *  @doesNotPerformAssertions
      */
@@ -28,8 +27,27 @@ class BestBuyTest extends TestCase
         }
     }
 
+    /** @test
+     *  @doesNotPerformAssertions
+     */
+    public function it_searches_a_product()
+    {
+        try {
+            $options = [
+                'show' => 'name,sku',
+                'sort' => 'salePrice.desc',
+                'filters' => 'onlineAvailability=true',
+                'pageSize' => 20,
+                'page' => 1,
+            ];
+            (new BestBuy())->search('Nintendo', $options);
+        } catch (\Exception $e) {
+            $this->fail('Failed to track the BestBuy API properly.' . $e->getMessage());
+        }
+    }
+
     /** @test */
-    public function it_creates_a_proper_stock_status_response()
+    public function it_creates_a_proper_product_status_response()
     {
         Http::fake(fn() => ['onlineAvailability' => true, 'salePrice' => 299.99, 'url' => '']);
         $productStatus = (new BestBuy())->checkAvailability(new Product());

@@ -15,7 +15,7 @@ class ProductHistoryTest extends TestCase
     {
         Notification::fake();
         $this->seed(RetailerWithProductSeeder::class);
-        $this->mockClientRequest();
+        $this->mockCheckAvailabilityRequest();
 
         $product = Product::first();
         $this->assertEmpty($product->history);

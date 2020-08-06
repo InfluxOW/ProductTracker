@@ -19,7 +19,7 @@ class TrackProductTest extends TestCase
 
         Notification::fake();
 
-        $this->mockClientRequest($available = true, $price = 24900);
+        $this->mockCheckAvailabilityRequest($available = true, $price = 24900);
 
         $this->seed(RetailerWithProductSeeder::class);
 

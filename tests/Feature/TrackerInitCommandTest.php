@@ -17,7 +17,7 @@ class TrackerInitCommandTest extends TestCase
 
         $this->assertFalse(Product::first()->in_stock);
 
-        $this->mockClientRequest();
+        $this->mockCheckAvailabilityRequest();
 
         $this->artisan('tracker:init');
 

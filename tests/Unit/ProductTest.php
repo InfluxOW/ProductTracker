@@ -37,7 +37,7 @@ class ProductTest extends TestCase
     public function it_updates_its_details_after_being_tracked()
     {
         Notification::fake();
-        $this->mockClientRequest($available = true, $price = 9900, $url = 'http://fake.test');
+        $this->mockCheckAvailabilityRequest($available = true, $price = 9900, $url = 'http://fake.test');
 
         $product = Product::first();
         $product->track();
