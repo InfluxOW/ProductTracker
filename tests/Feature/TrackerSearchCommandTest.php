@@ -2,17 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Clients\Helpers\SearchPagination;
 use App\Retailer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Http;
-use Tests\TestCase;
 use RetailersSeeder;
+use Tests\TestCase;
 
 class TrackerSearchCommandTest extends TestCase
 {
-    protected function setUp():void
+    protected function setUp(): void
     {
         parent::setUp();
 

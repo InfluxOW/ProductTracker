@@ -41,7 +41,8 @@ class BestBuy implements Client
         $results = Http::get($this->searchEndpoint($input, $options))->json();
 
         $products = array_reduce($results['products'], function ($carry, $product) {
-            $carry[] = replaceArrayKeysWithMapper($product, array_flip($this->getProductAttributes()));
+            $product = replaceArrayKeysWithMapper($product, array_flip($this->getProductAttributes()));
+            $carry[] = $this->convertPriceToCents($product);
             return $carry;
         }, []);
 
@@ -101,5 +102,17 @@ class BestBuy implements Client
             'sort' => 'sort',
             'attributes' => 'show',
         ];
+    }
+
+    /**
+     * @param array $product
+     * @return array
+     */
+    protected function convertPriceToCents(array $product): array
+    {
+        if (isset($product['price'])) {
+            $product['price'] = (int)($product['price'] * 100);
+        }
+        return $product;
     }
 }

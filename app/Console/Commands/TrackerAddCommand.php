@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Exceptions\StockException;
 use App\Product;
+use \Illuminate\Validation\ValidationException;
 use Validator;
 
 class TrackerAddCommand extends Tracker
@@ -42,7 +43,7 @@ class TrackerAddCommand extends Tracker
 
         if ($this->confirm('Do you want to add any additional product information?')) {
             $attributes['url'] = $this->askWithValidation('Enter url of the product', 'url', $rules['url']);
-            $attributes['price'] = $this->askWithValidation('Enter price of the product', 'price', $rules['price']);
+            $attributes['price'] = $this->askWithValidation('Enter price of the product in cents', 'price', $rules['price']);
             $attributes['in_stock'] = $this->confirm('Is product in stock?');
         }
 
@@ -61,12 +62,10 @@ class TrackerAddCommand extends Tracker
         ];
         $validator = Validator::make($attributes, $this->productValidationRules());
 
-        if ($validator->fails()) {
-            foreach ($validator->errors()->all() as $error) {
-                $this->error($error);
-            }
-            exit();
-        }
+        throw_if(
+            $validator->fails(),
+            ValidationException::withMessages($validator->getMessageBag()->toArray())
+        );
 
         return $attributes;
     }

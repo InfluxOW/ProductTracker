@@ -48,6 +48,7 @@ class TrackerSearchCommand extends Tracker
             $this->product,
             $this->transformSearchOptions()
         );
+
     }
 
     protected function transformSearchOptions()
