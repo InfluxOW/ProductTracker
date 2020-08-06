@@ -7,7 +7,6 @@ use App\Clients\Helpers\ProductStatus;
 use App\Clients\Helpers\SearchItem;
 use App\Clients\Helpers\SearchPagination;
 use App\Clients\Helpers\SearchResults;
-use App\Console\Commands\Tracker;
 use App\Exceptions\ApiException;
 use App\Product;
 use Illuminate\Support\Facades\Http;
@@ -51,17 +50,13 @@ class BestBuy implements Client
         return new SearchResults($products, $pagination);
     }
 
-    public function productEndpoint(...$params): string
+    public function productEndpoint($sku): string
     {
-        [$sku] = $params;
-
         return "https://api.bestbuy.com/v1/products/{$sku}.json?apiKey={$this->key}";
     }
 
-    public function searchEndpoint(...$params): string
+    public function searchEndpoint($input, $options): string
     {
-        [$input, $options] = $params;
-
         $query = http_build_query([
             'format' => 'json',
             'show' => $options['show'],
@@ -92,7 +87,8 @@ class BestBuy implements Client
             'price' => 'salePrice',
             'url' => 'url',
             'in_stock' => 'onlineAvailability',
-            'releaseDate' => 'releaseDate'
+            'releaseDate' => 'releaseDate',
+            'description' => 'description'
         ];
     }
 

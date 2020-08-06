@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Clients\Helpers\SearchResults;
 use App\Exceptions\ProductException;
 use App\Retailer;
 
@@ -19,16 +20,17 @@ class TrackerSearchCommand extends Tracker
 
     protected string $product;
     protected Retailer $retailer;
+    protected SearchResults $results;
 
     public function handle()
     {
         $this->setInitialData();
 
-        $results = $this->getSearchResults();
+        $this->search();
 
-        $this->displayResults($results);
+        $this->displayResults();
 
-        $this->startTracking($results->products);
+        $this->trackResults();
     }
 
     protected function setInitialData()
@@ -40,9 +42,9 @@ class TrackerSearchCommand extends Tracker
         $this->product = $this->argument('product') ?? $this->ask('What product are you looking for?');
     }
 
-    protected function getSearchResults()
+    protected function search()
     {
-        return $this->retailer->client()->search(
+        $this->results = $this->retailer->client()->search(
             $this->product,
             $this->transformSearchOptions()
         );
@@ -51,33 +53,34 @@ class TrackerSearchCommand extends Tracker
     protected function transformSearchOptions()
     {
         $optionsWithCorrectKeys = replaceArrayKeysWithMapper($this->options(), $this->retailer->client()->getSearchAttributes());
-        return replaceArrayValuesWithMapper($optionsWithCorrectKeys, $this->retailer->client()->getProductAttributes());
+        $optionsWithCorrectKeysAndValues = replaceArrayValuesWithMapper($optionsWithCorrectKeys, $this->retailer->client()->getProductAttributes());
+        return $this->addRequiredShowAttributes($optionsWithCorrectKeysAndValues);
     }
 
-    protected function displayResults($results)
+    protected function displayResults()
     {
         $this->table(
-            array_keys($results->products[0]),
-            $results->products
+            array_keys($this->results->products[0]),
+            $this->results->products
         );
-        $this->info(json_encode($results->pagination));
+        $this->info(json_encode($this->results->pagination));
     }
 
-    protected function startTracking($products)
+    protected function trackResults()
     {
-        if ($this->confirm('Do you want to track one of the above results?')) {
-            $this->track($this->getItemToTrack($products));
+        if ($this->confirm('Do you want to track one of the above products?')) {
+            $this->track($this->chooseProductToTrack($this->results->products));
 
             while ($this->confirm('Do you want to track anything else?')) {
-                $this->track($this->getItemToTrack($products));
+                $this->track($this->chooseProductToTrack($this->results->products));
             }
         }
     }
 
-    protected function getItemToTrack($products)
+    protected function chooseProductToTrack($products)
     {
         $sku = $this->askWithValidation('Enter SKU of the product you want to track', 'sku', $this->productValidationRules()['sku']);
-        $item = collect($products)->firstWhere('sku', '==', $sku);
+        $item = collect($products)->firstWhere('sku', $sku);
 
         throw_if(
             is_null($item),
@@ -99,5 +102,18 @@ class TrackerSearchCommand extends Tracker
                 $item['in_stock'] ?? null,
             ]
         ]);
+    }
+
+    protected function addRequiredShowAttributes(array $options)
+    {
+        if (! str_contains($options['show'], 'name')) {
+            $options['show'] = "name," . $options['show'];
+        }
+
+        if (! str_contains($options['show'], 'sku')) {
+            $options['show'] = "sku," . $options['show'];
+        }
+
+        return $options;
     }
 }

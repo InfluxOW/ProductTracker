@@ -13,8 +13,8 @@ interface Client
     public function search($product, $options): SearchResults;
 
     /* Endpoints */
-    public function productEndpoint(...$params): string;
-    public function searchEndpoint(...$params): string;
+    public function productEndpoint($sku): string;
+    public function searchEndpoint($input, $options): string;
 
     /* Getters */
 
