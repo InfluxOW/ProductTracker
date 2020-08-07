@@ -6,7 +6,7 @@ use App\Product;
 use RetailerWithProductSeeder;
 use Tests\TestCase;
 
-class TrackerUntrackCommandTest extends TestCase
+class TrackerRemoveCommandTest extends TestCase
 {
     protected function setUp():void
     {
@@ -22,7 +22,7 @@ class TrackerUntrackCommandTest extends TestCase
 
         $this->assertCount(1, Product::all());
 
-        $this->artisan("tracker:untrack '{$product->name}'")
+        $this->artisan("tracker:remove '{$product->name}'")
             ->assertExitCode(0);
 
         $this->assertEmpty(Product::all());
@@ -31,7 +31,7 @@ class TrackerUntrackCommandTest extends TestCase
     /** @test */
     public function it_throws_an_error_if_the_product_has_not_been_found()
     {
-        $this->artisan("tracker:untrack 'Random Product'")
+        $this->artisan("tracker:remove 'Random Product'")
             ->assertExitCode(1);
     }
 }

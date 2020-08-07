@@ -5,11 +5,11 @@ namespace App\Console\Commands;
 use App\Exceptions\ProductException;
 use App\Product;
 
-class TrackerUntrackCommand extends Tracker
+class TrackerRemoveCommand extends Tracker
 {
-    protected $signature = 'tracker:untrack
+    protected $signature = 'tracker:remove
     { product? : Full name or first letters of the product you want to untrack [register matters] }';
-    protected $description = 'Untrack any product';
+    protected $description = 'Remove any product from the tracker';
 
     public function isHidden()
     {
