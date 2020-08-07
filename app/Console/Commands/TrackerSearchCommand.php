@@ -22,6 +22,11 @@ class TrackerSearchCommand extends Tracker
     protected Retailer $retailer;
     protected SearchResults $results;
 
+    public function isHidden()
+    {
+        return false;
+    }
+
     public function handle()
     {
         $this->setInitialData();

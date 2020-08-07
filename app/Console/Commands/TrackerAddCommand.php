@@ -14,6 +14,11 @@ class TrackerAddCommand extends Tracker
     { product?* : Product details [required: name, sku; optional: url, price, in_stock] }';
     protected $description = 'Add new product to the tracker';
 
+    public function isHidden()
+    {
+        return false;
+    }
+
     public function handle()
     {
         $product = $this->createProduct();

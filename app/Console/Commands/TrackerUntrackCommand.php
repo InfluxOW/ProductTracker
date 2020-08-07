@@ -11,6 +11,11 @@ class TrackerUntrackCommand extends Tracker
     { product? : Full name or first letters of the product you want to untrack [register matters] }';
     protected $description = 'Untrack any product';
 
+    public function isHidden()
+    {
+        return false;
+    }
+
     public function handle()
     {
         $name = $this->argument('product') ?? $this->ask('Enter full name or first letters of the product you want to untrack [register matters]');

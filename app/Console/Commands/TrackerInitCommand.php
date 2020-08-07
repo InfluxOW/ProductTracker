@@ -9,6 +9,11 @@ class TrackerInitCommand extends Tracker
     protected $signature = 'tracker:init';
     protected $description = 'Initialize tracking on every product';
 
+    public function isHidden()
+    {
+        return false;
+    }
+
     public function handle()
     {
         $this->output->progressStart(Product::count());

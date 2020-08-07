@@ -13,6 +13,13 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(RetailerWithProductSeeder::class);
+    }
+
     /** @test */
     public function it_can_be_tracked()
     {
@@ -46,12 +53,5 @@ class ProductTest extends TestCase
         $this->assertEquals($price, $product->fresh()->price);
         $this->assertEquals($url, $product->fresh()->url);
 
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->seed(RetailerWithProductSeeder::class);
     }
 }

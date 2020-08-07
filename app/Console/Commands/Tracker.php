@@ -8,8 +8,15 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class Tracker extends Command
+class Tracker extends Command
 {
+    protected $signature = 'tracker';
+
+    public function isHidden()
+    {
+        return true;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
@@ -37,14 +44,14 @@ abstract class Tracker extends Command
         return $retailer;
     }
 
-    protected function retailers()
+    public function retailers()
     {
         return array_map(function ($file) {
             return $file->getFilenameWithoutExtension();
         }, getFilesInfo(app_path('Clients/Implementations')));
     }
 
-    protected function productValidationRules()
+    public function productValidationRules()
     {
         return [
             'name' => ['required', 'string', 'min:3'],
