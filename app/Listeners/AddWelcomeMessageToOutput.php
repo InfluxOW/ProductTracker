@@ -12,7 +12,7 @@ class AddWelcomeMessageToOutput
     public function handle(CommandStarting $event)
     {
         if (Str::startsWith($event->command, 'tracker')) {
-            $event->output->writeLn('Welcome to Product Tracker!');
+            $event->output->writeLn("<options=bold;bg=cyan> Welcome to Product Tracker! </>");
             $event->output->write(PHP_EOL);
         }
     }
